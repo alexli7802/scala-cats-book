@@ -13,9 +13,23 @@ trait JsonWriter[A] {
  * implicit instances of type class
  */
 object JsonWriters {
+
+  implicit val intWriter: JsonWriter[Int] = 
+    new JsonWriter[Int] {
+      def write(value: Int): Json = JsNumber(value)
+    }
   
   implicit val stringWriter: JsonWriter[String] = 
     new JsonWriter[String] {
       def write(value: String): Json = JsString(value)
     }
+  
+  implicit def optionWriter[A](implicit w: JsonWriter[A]): JsonWriter[Option[A]] = 
+    new JsonWriter[Option[A]] {
+      def write(value: Option[A]): Json = value match {
+        case Some(aValue) => w.write(aValue)
+        case None => JsNull
+      }
+    }
+  
 }
